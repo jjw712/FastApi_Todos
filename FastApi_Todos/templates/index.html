@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; margin: 2em; background-color: #f4f4f4; color: #333; }
+        h1 { text-align: center; }
+        #container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        li:last-child { border-bottom: none; }
+        form { display: flex; margin-top: 20px; }
+        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 15px; border: none; background: #5cb85c; color: white; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+        button.delete { background: #d9534f; }
+        button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- ===== v2.0.0 업데이트 표시용 네모 박스 ===== -->
+        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; text-align: center; background-color: #f9f9f9;">
+            <p><strong>Version 2.0.0</strong>: UI가 개선되었습니다.</p>
+        </div>
+
+        <h1>To-Do List</h1>
+        <form id="todo-form">
+            <input type="text" id="title" placeholder="Title" required>
+            <input type="text" id="description" placeholder="Description" required>
+            <button type="submit">Add To-Do</button>
+        </form>
+        <ul id="todo-list"></ul>
+    </div>
+
+    <script>
+        async function fetchTodos() {
+            const response = await fetch('/todos');
+            const todos = await response.json();
+            const todoList = document.getElementById('todo-list');
+            todoList.innerHTML = '';
+            todos.forEach(todo => {
+                const li = document.createElement('li');
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = `${todo.title}: ${todo.description} (Completed: ${todo.completed})`;
+                if (todo.completed) {
+                    textSpan.style.textDecoration = 'line-through';
+                }
+
+                const buttonDiv = document.createElement('div');
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.onclick = () => editTodo(todo.id, todo.title, todo.description, todo.completed);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'delete';
+                deleteButton.onclick = () => deleteTodo(todo.id);
+
+                li.appendChild(textSpan);
+                buttonDiv.appendChild(editButton);
+                buttonDiv.appendChild(deleteButton);
+                li.appendChild(buttonDiv);
+
+                todoList.appendChild(li);
+            });
+        }
+
+        async function editTodo(id, currentTitle, currentDesc, currentStatus) {
+            const title = prompt('Enter new title:', currentTitle);
+            const description = prompt('Enter new description:', currentDesc);
+            if (title === null || description === null) return; // 사용자가 취소한 경우
+
+            const completed = confirm('Is this task completed?');
+
+            const response = await fetch(`/todos/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, title, description, completed })
+            });
+            if (response.ok) {
+                fetchTodos();
+            }
+        }
+
+        async function deleteTodo(id) {
+            if (!confirm('Are you sure you want to delete this item?')) return;
+
+            const response = await fetch(`/todos/${id}`, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                fetchTodos();
+            }
+        }
+
+        document.getElementById('todo-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const titleInput = document.getElementById('title');
+            const descriptionInput = document.getElementById('description');
+            const title = titleInput.value;
+            const description = descriptionInput.value;
+            const response = await fetch('/todos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: Date.now(), title, description, completed: false })
+            });
+            if (response.ok) {
+                titleInput.value = '';
+                descriptionInput.value = '';
+                fetchTodos();
+            }
+        });
+
+        fetchTodos();
+    </script>
+</body>
+</html>
