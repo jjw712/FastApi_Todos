@@ -3,8 +3,8 @@ version: "3.7"
 services:
   fastapi-app:
     build:
-      context: ./fastapi-app      # DockerfileÀÌ À§Ä¡ÇÑ µğ·ºÅä¸® °æ·Î
-      dockerfile: Dockerfile      # Dockerfile ÀÌ¸§ (»ı·« °¡´É, ±âº»°ªÀº 'Dockerfile')
+      context: ./fastapi-app      # Dockerfileì´ ìœ„ì¹˜í•œ ë””ë ‰í† ë¦¬ ê²½ë¡œ
+      dockerfile: Dockerfile      # Dockerfile ì´ë¦„ (ìƒëµ ê°€ëŠ¥, ê¸°ë³¸ê°’ì€ 'Dockerfile')
     container_name: FastApi-app
     ports:
       - "5001:5001"
