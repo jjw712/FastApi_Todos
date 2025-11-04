@@ -7,17 +7,17 @@ import uvicorn
 
 app = FastAPI()
 
-# To-Do Ç×¸ñ ¸ğµ¨
+# To-Do í•­ëª© ëª¨ë¸
 class TodoItem(BaseModel):
     id: int
     title: str
     description: str
     completed: bool
 
-# JSON ÆÄÀÏ °æ·Î
+# JSON íŒŒì¼ ê²½ë¡œ
 TODO_FILE = "todo.json"
 
-# JSON ÆÄÀÏ¿¡¼­ To-Do Ç×¸ñ ·Îµå
+# JSON íŒŒì¼ì—ì„œ To-Do í•­ëª© ë¡œë“œ
 def load_todos():
     if os.path.exists(TODO_FILE):
         with open(TODO_FILE, "r", encoding="utf-8") as file:
@@ -27,17 +27,17 @@ def load_todos():
                 return []
     return []
 
-# JSON ÆÄÀÏ¿¡ To-Do Ç×¸ñ ÀúÀå
+# JSON íŒŒì¼ì— To-Do í•­ëª© ì €ì¥
 def save_todos(todos):
     with open(TODO_FILE, "w", encoding="utf-8") as file:
         json.dump(todos, file, indent=4)
 
-# To-Do ¸ñ·Ï Á¶È¸
+# To-Do ëª©ë¡ ì¡°íšŒ
 @app.get("/todos", response_model=list[TodoItem])
 def get_todos():
     return load_todos()
 
-# ½Å±Ô To-Do Ç×¸ñ Ãß°¡
+# ì‹ ê·œ To-Do í•­ëª© ì¶”ê°€
 @app.post("/todos", response_model=TodoItem)
 def create_todo(todo: TodoItem):
     todos = load_todos()
@@ -45,7 +45,7 @@ def create_todo(todo: TodoItem):
     save_todos(todos)
     return todo
 
-# To-Do Ç×¸ñ ¼öÁ¤
+# To-Do í•­ëª© ìˆ˜ì •
 @app.put("/todos/{todo_id}", response_model=TodoItem)
 def update_todo(todo_id: int, updated_todo: TodoItem):
     todos = load_todos()
@@ -56,7 +56,7 @@ def update_todo(todo_id: int, updated_todo: TodoItem):
             return updated_todo
     raise HTTPException(status_code=404, detail="To-Do item not found!!!_SJ")
 
-# To-Do Ç×¸ñ »èÁ¦
+# To-Do í•­ëª© ì‚­ì œ
 @app.delete("/todos/{todo_id}", response_model=dict)
 def delete_todo(todo_id: int):
     todos = load_todos()
@@ -67,7 +67,7 @@ def delete_todo(todo_id: int):
         return {"message": "To-Do item deleted"}
     raise HTTPException(status_code=404, detail="To-Do item not found to delete")
 
-# HTML ÆÄÀÏ ¼­ºù
+# HTML íŒŒì¼ ì„œë¹™
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     with open("templates/index.html", "r", encoding="utf-8") as file:
@@ -77,4 +77,5 @@ def read_root():
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
 
-# ÀÚµ¿ ¹èÆ÷ Å×½ºÆ® ¼º°ø±â¿ø 1¼øÀ§
+# ìë™ ë°°í¬ í…ŒìŠ¤íŠ¸ ì„±ê³µê¸°ì› 1ìˆœìœ„
+

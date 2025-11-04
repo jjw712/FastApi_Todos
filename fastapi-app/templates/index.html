@@ -20,9 +20,9 @@
 </head>
 <body>
     <div id="container">
-        <!-- ===== v2.0.0 ¾÷µ¥ÀÌÆ® Ç¥½Ã¿ë ³×¸ğ ¹Ú½º ===== -->
+        <!-- ===== v2.0.0 ì—…ë°ì´íŠ¸ í‘œì‹œìš© ë„¤ëª¨ ë°•ìŠ¤ ===== -->
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; text-align: center; background-color: #f9f9f9;">
-            <p><strong>Version 2.0.0</strong>: UI°¡ °³¼±µÇ¾ú½À´Ï´Ù.</p>
+            <p><strong>Version 2.0.0</strong>: UIê°€ ê°œì„ ë˜ì—ˆìŠµë‹ˆë‹¤.</p>
         </div>
 
         <h1>To-Do List</h1>
@@ -72,7 +72,7 @@
         async function editTodo(id, currentTitle, currentDesc, currentStatus) {
             const title = prompt('Enter new title:', currentTitle);
             const description = prompt('Enter new description:', currentDesc);
-            if (title === null || description === null) return; // »ç¿ëÀÚ°¡ Ãë¼ÒÇÑ °æ¿ì
+            if (title === null || description === null) return; // ì‚¬ìš©ìê°€ ì·¨ì†Œí•œ ê²½ìš°
 
             const completed = confirm('Is this task completed?');
 
