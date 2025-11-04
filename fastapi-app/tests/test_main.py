@@ -1,20 +1,32 @@
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import main
+from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 from main import app, save_todos, load_todos, TodoItem
 
 client = TestClient(app)
 
+@pytest.fixture(scope="session", autouse=True)
+def _chdir_to_app_dir():
+    prev = os.getcwd()
+    app_dir = Path(__file__).resolve().parent.parent  # fastapi-app
+    os.chdir(app_dir)
+    try:
+        yield
+    finally:
+        os.chdir(prev)
+        
 @pytest.fixture(autouse=True)
-def setup_and_teardown():
-    # 
-    save_todos([])
+def _isolate_todo_file(tmp_path, monkeypatch):
+    tmp_todo = tmp_path / "todo.json"
+    monkeypatch.setattr(main, "TODO_FILE", str(tmp_todo))
+    main.save_todos([])   # before
     yield
-    #
-    save_todos([])
+    main.save_todos([])   # after
 
 def test_root_serves_html():
     r = client.get("/")
