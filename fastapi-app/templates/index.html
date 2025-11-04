@@ -16,13 +16,15 @@
         button { padding: 10px 15px; border: none; background: #5cb85c; color: white; border-radius: 4px; cursor: pointer; margin-left: 10px; }
         button.delete { background: #d9534f; }
         button:hover { opacity: 0.9; }
+        button.finish { background: #0b5ed7; color:#fff; }  /* 접근성 대비 OK */
+        button.finish:disabled { background:#6c757d; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <div id="container">
-        <!-- ===== v2.0.0 업데이트 표시용 네모 박스 ===== -->
+        <!-- ===== v5.0.0 업데이트 표시용 네모 박스 ===== -->
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; text-align: center; background-color: #f9f9f9;">
-            <p><strong>Version 2.0.0</strong>: UI가 개선되었습니다.</p>
+            <p><strong>Version 5.0.0</strong>: UI가 개선되었습니다.</p>
         </div>
 
         <h1>To-Do List</h1>
@@ -60,9 +62,20 @@
                 deleteButton.className = 'delete';
                 deleteButton.onclick = () => deleteTodo(todo.id);
 
+                const finishButton = document.createElement('button');
+                finishButton.textContent = 'Finish';
+                finishButton.className = 'finish';
+                finishButton.disabled = !!todo.completed;
+                finishButton.onclick = async () => {
+                    let res = await fetch(`/todos/${todo.id}/finish`, { method: 'POST' });
+
+                    if (res.ok) fetchTodos();
+                };
+
                 li.appendChild(textSpan);
                 buttonDiv.appendChild(editButton);
                 buttonDiv.appendChild(deleteButton);
+                buttonDiv.appendChild(finishButton);
                 li.appendChild(buttonDiv);
 
                 todoList.appendChild(li);

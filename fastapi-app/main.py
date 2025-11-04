@@ -1,5 +1,5 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 import json
 import os
@@ -66,6 +66,31 @@ def delete_todo(todo_id: int):
         save_todos(todos)
         return {"message": "To-Do item deleted"}
     raise HTTPException(status_code=404, detail="To-Do item not found to delete")
+
+
+# (A) API용: 완료 처리 후 JSON 반환
+@app.post("/todos/{todo_id}/finish", response_model=TodoItem)
+def finish_todo_api(todo_id: int):
+    todos = load_todos()
+    for i, t in enumerate(todos):
+        if t["id"] == todo_id:
+            if not t.get("completed", False):
+                t["completed"] = True
+                save_todos(todos)
+            return t  # 이미 true여도 그대로 반환
+    raise HTTPException(status_code=404, detail="To-Do item not found")
+
+# (B) 페이지용: 버튼 누르면 완료 처리 → 루트로 리다이렉트
+@app.post("/finish/{todo_id}")
+def finish_todo_redirect(todo_id: int):
+    todos = load_todos()
+    for i, t in enumerate(todos):
+        if t["id"] == todo_id:
+            if not t.get("completed", False):
+                t["completed"] = True
+                save_todos(todos)
+            return RedirectResponse(url="/", status_code=303)
+    raise HTTPException(status_code=404, detail="To-Do item not found")
 
 # HTML 파일 서빙
 @app.get("/", response_class=HTMLResponse)
