@@ -16,6 +16,12 @@ def setup_and_teardown():
     #
     save_todos([])
 
+def test_root_serves_html():
+    r = client.get("/")
+    assert r.status_code == 200
+    assert "To-Do List" in r.text
+
+
 def test_get_todos_empty():
     response = client.get("/todos")
     assert response.status_code == 200
@@ -78,6 +84,11 @@ def test_finish_todo():
     data = client.get("/todos").json()
     item = next((t for t in data if t["id"] == 10), None)
     assert item and item["completed"] is True
+    
+def test_finish_not_found():
+    r = client.post("/todos/999999/finish")
+    assert r.status_code == 404
+
 
 def test_finish_via_put():
     todo = TodoItem(id=11, title="ToBeFinished", description="desc", completed=False)
