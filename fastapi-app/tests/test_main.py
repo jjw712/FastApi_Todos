@@ -64,3 +64,25 @@ def test_delete_todo_not_found():
     response = client.delete("/todos/999")
     assert response.status_code == 404
     #assert response.json()["message"] == "To-Do item deleted"
+    
+def test_finish_todo():
+    # 준비: 미완료 항목 하나 저장
+    todo = TodoItem(id=10, title="FinishMe", description="desc", completed=False)
+    save_todos([todo.dict()])  # pydantic v2면 todo.model_dump() 써도 됨
+
+    # 액션: 완료 처리
+    r = client.post("/todos/10/finish")
+    assert r.status_code in (200, 303)
+
+    # 검증: completed == True
+    data = client.get("/todos").json()
+    item = next((t for t in data if t["id"] == 10), None)
+    assert item and item["completed"] is True
+
+def test_finish_via_put():
+    todo = TodoItem(id=11, title="ToBeFinished", description="desc", completed=False)
+    save_todos([todo.dict()])
+    r = client.put("/todos/11", json={"id": 11, "title": "ToBeFinished", "description": "desc", "completed": True})
+    assert r.status_code == 200
+    assert r.json()["completed"] is True
+
