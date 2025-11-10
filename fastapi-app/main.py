@@ -4,20 +4,23 @@ from pydantic import BaseModel
 import json
 import os
 import uvicorn
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
 
-# To-Do í•­ëª© ëª¨ë¸
+# Prometheus ¸ŞÆ®¸¯½º ¿£µåÆ÷ÀÎÆ® (/metrics)
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+# To-Do ?•­ëª? ëª¨ë¸
 class TodoItem(BaseModel):
     id: int
     title: str
     description: str
     completed: bool
 
-# JSON íŒŒì¼ ê²½ë¡œ
+# JSON ?ŒŒ?¼ ê²½ë¡œ
 TODO_FILE = "todo.json"
 
-# JSON íŒŒì¼ì—ì„œ To-Do í•­ëª© ë¡œë“œ
+# JSON ?ŒŒ?¼?—?„œ To-Do ?•­ëª? ë¡œë“œ
 def load_todos():
     if os.path.exists(TODO_FILE):
         with open(TODO_FILE, "r", encoding="utf-8") as file:
@@ -27,7 +30,7 @@ def load_todos():
                 return []
     return []
 
-# JSON íŒŒì¼ì— To-Do í•­ëª© ì €ì¥
+# JSON ?ŒŒ?¼?— To-Do ?•­ëª? ????¥
 def save_todos(todos):
     with open(TODO_FILE, "w", encoding="utf-8") as file:
         json.dump(todos, file, indent=4)
@@ -37,7 +40,7 @@ def save_todos(todos):
 def get_todos():
     return load_todos()
 
-# ì‹ ê·œ To-Do í•­ëª© ì¶”ê°€
+# ?‹ ê·? To-Do ?•­ëª? ì¶”ê??
 @app.post("/todos", response_model=TodoItem)
 def create_todo(todo: TodoItem):
     todos = load_todos()
@@ -45,7 +48,7 @@ def create_todo(todo: TodoItem):
     save_todos(todos)
     return todo
 
-# To-Do í•­ëª© ìˆ˜ì •
+# To-Do ?•­ëª? ?ˆ˜? •
 @app.put("/todos/{todo_id}", response_model=TodoItem)
 def update_todo(todo_id: int, updated_todo: TodoItem):
     todos = load_todos()
@@ -56,7 +59,7 @@ def update_todo(todo_id: int, updated_todo: TodoItem):
             return updated_todo
     raise HTTPException(status_code=404, detail="To-Do item not found!!!_SJ")
 
-# To-Do í•­ëª© ì‚­ì œ
+# To-Do ?•­ëª? ?‚­? œ
 @app.delete("/todos/{todo_id}", response_model=dict)
 def delete_todo(todo_id: int):
     todos = load_todos()
@@ -68,7 +71,7 @@ def delete_todo(todo_id: int):
     raise HTTPException(status_code=404, detail="To-Do item not found to delete")
 
 
-# (A) APIìš©: ì™„ë£Œ ì²˜ë¦¬ í›„ JSON ë°˜í™˜
+# (A) API?š©: ?™„ë£? ì²˜ë¦¬ ?›„ JSON ë°˜í™˜
 @app.post("/todos/{todo_id}/finish", response_model=TodoItem)
 def finish_todo_api(todo_id: int):
     todos = load_todos()
@@ -77,10 +80,10 @@ def finish_todo_api(todo_id: int):
             if not t.get("completed", False):
                 t["completed"] = True
                 save_todos(todos)
-            return t  # ì´ë¯¸ trueì—¬ë„ ê·¸ëŒ€ë¡œ ë°˜í™˜
+            return t  # ?´ë¯? true?—¬?„ ê·¸ë??ë¡? ë°˜í™˜
     raise HTTPException(status_code=404, detail="To-Do item not found")
 
-# (B) í˜ì´ì§€ìš©: ë²„íŠ¼ ëˆ„ë¥´ë©´ ì™„ë£Œ ì²˜ë¦¬ â†’ ë£¨íŠ¸ë¡œ ë¦¬ë‹¤ì´ë ‰íŠ¸
+# (B) ?˜?´ì§??š©: ë²„íŠ¼ ?ˆ„ë¥´ë©´ ?™„ë£? ì²˜ë¦¬ ?†’ ë£¨íŠ¸ë¡? ë¦¬ë‹¤?´? ‰?Š¸
 @app.post("/finish/{todo_id}")
 def finish_todo_redirect(todo_id: int):
     todos = load_todos()
@@ -92,7 +95,7 @@ def finish_todo_redirect(todo_id: int):
             return RedirectResponse(url="/", status_code=303)
     raise HTTPException(status_code=404, detail="To-Do item not found")
 
-# HTML íŒŒì¼ ì„œë¹™
+# HTML ?ŒŒ?¼ ?„œë¹?
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     with open("templates/index.html", "r", encoding="utf-8") as file:
@@ -102,5 +105,5 @@ def read_root():
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
 
-# ìë™ ë°°í¬ í…ŒìŠ¤íŠ¸ ì„±ê³µê¸°ì› 1ìˆœìœ„
+# ??™ ë°°í¬ ?…Œ?Š¤?Š¸ ?„±ê³µê¸°?› 1?ˆœ?œ„
 
