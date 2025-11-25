@@ -91,7 +91,7 @@
           <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
           <stringProp name="HTTPSampler.monitor">false</stringProp>
           <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          <stringProp name="HTTPSampler.contentEncoding">application/json</stringProp>
+      
         </HTTPSamplerProxy>
         <hashTree/>
         <!-- 샘플러 3: GET /users (전체 사용자 조회) -->
