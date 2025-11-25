@@ -91,7 +91,7 @@
           <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
           <stringProp name="HTTPSampler.monitor">false</stringProp>
           <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-      
+      //    <stringProp name="HTTPSampler.contentEncoding">application/json</stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
         <!-- 샘플러 3: GET /users (전체 사용자 조회) -->
@@ -99,7 +99,7 @@
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.domain">13.125.46.85</stringProp>
           <stringProp name="HTTPSampler.port">8003</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/users</stringProp>
