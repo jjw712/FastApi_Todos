@@ -6,11 +6,11 @@ import os
 import uvicorn
 import logging
 import time
-from multiprocessing import Queue
+from queue import Queue
 from os import getenv
 from fastapi import Request
 from prometheus_fastapi_instrumentator import Instrumentator
-from logging_loki import LokiQueueHandler
+from logging_loki import LokiSHandler
 
 
 app = FastAPI()
@@ -19,20 +19,32 @@ app = FastAPI()
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 # To-Do ?���? 모델
 
-loki_logs_handler = LokiQueueHandler(
-    Queue(-1),
-    url=getenv("LOKI_ENDPOINT"),
+# === Loki ENV 체크 ===
+LOKI_ENDPOINT = getenv("LOKI_ENDPOINT")
+assert LOKI_ENDPOINT, "LOKI_ENDPOINT not set"
+
+loki_handler = LokiHandler(
+    url=LOKI_ENDPOINT,
     tags={"application": "fastapi"},
     version="1",
 )
+
+# loki_logs_handler = LokiQueueHandler(
+#     Queue(-1),
+#     url=getenv("LOKI_ENDPOINT"),
+#     tags={"application": "fastapi"},
+#     version="1",
+# )
+
 
 # Custom access logger (ignore Uvicorn's default logging)
 custom_logger = logging.getLogger("custom.access")
 custom_logger.setLevel(logging.INFO)
 
 # Add Loki handler (assuming `loki_logs_handler` is correctly configured)
-custom_logger.addHandler(loki_logs_handler)
+custom_logger.addHandler(loki_handler)
 
+@app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
